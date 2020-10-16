@@ -2,9 +2,9 @@
 
 namespace SearchFlight.Model
 {
-    public class ProgrammingLanguage
+    public class SearchText
     {
-        public ProgrammingLanguage(int id, string name)
+        public SearchText(int id, string name)
         {
             Id = id;
             Name = name;

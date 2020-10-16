@@ -1,20 +1,20 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SearchFlight.Application;
-using SearchFlight.Application.DTOs.Request.ProgrammingLanguageEngine;
+using SearchFlight.Application.DTOs.Request;
+using SearchFlight.Application.DTOs.Response;
 using SearchFlight.Application.Interfaces;
+using SearchFlight.Application.Services;
+using SearchFlight.Application.Services.Interfaces;
+using SearchFlight.Common;
+using SearchFlight.CrossCutting;
 using SearchFlight.Model;
+using SearchFlight.Repositories;
 using SearchFlight.Repositories.Interfaces;
 using SearchFlight.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SearchFlight.CrossCutting;
-using SearchFlight.Application.DTOs.Response;
-using SearchFlight.Application.Services.Interfaces;
-using SearchFlight.Application.Services;
-using SearchFlight.Repositories;
-using SearchFlight.Common;
 
 namespace Tests
 {
@@ -32,27 +32,27 @@ namespace Tests
         public void SearchDoesNotWork()
         {
             //Arrange
-            var service = _applicationProvider.GetService<IProgrammingLanguageEngineApplication>();
-            var criteria = new SearchProgrammingLanguageRequest();
+            var service = _applicationProvider.GetService<ISearchEngineApplication>();
+            var criteria = new SearchRequest();
             criteria.Criteria.Add(Constants.ProgrammingLanguage.Java);
             criteria.Criteria.Add(Constants.ProgrammingLanguage.Net);
 
             //Act
-            var searchProgrammingLanguaResult = service.SearchProgrammingLanguage(criteria);
+            var searchResult = service.SearchTerm(criteria);
 
             //Assert
-            Assert.IsTrue(searchProgrammingLanguaResult.Any(), "Search does not works");
+            Assert.IsTrue(searchResult.Any(), "Search does not works");
         }
 
         [Test]
         public void YahooWinnerInNet()
         {
             //Arrange
-            var programmingLanguageEngineList = GetData();
+            var data = GetData();
 
             //Act
-            var searchProgrammingLanguaResult = SearchCriteria(programmingLanguageEngineList);
-            var isYahooWinner = searchProgrammingLanguaResult.Any(q => q.TextReport.ToLower().Contains(string.Format("{0} Winner", Constants.EngineName.Yahoo).ToLower()));
+            var searchResult = SearchResult(data);
+            var isYahooWinner = searchResult.Any(q => q.TextReport.ToLower().Contains(string.Format("{0} Winner", Constants.EngineName.Yahoo).ToLower()));
 
             //Assert
             Assert.IsTrue(isYahooWinner, string.Format("{0} should be winner in {1}", Constants.EngineName.Yahoo, Constants.ProgrammingLanguage.Net));
@@ -63,11 +63,11 @@ namespace Tests
         public void JavaTotalWinner()
         {
             //Arrange
-            var programmingLanguageEngineList = GetData();
+            var data = GetData();
 
             //Act
-            var searchProgrammingLanguaResult = SearchCriteria(programmingLanguageEngineList);
-            var isJavaTotalWinner = searchProgrammingLanguaResult.Any(q => q.TextReport.ToLower().Contains(string.Format("Total winner: {0}", Constants.ProgrammingLanguage.Java).ToLower()));
+            var searchResult = SearchResult(data);
+            var isJavaTotalWinner = searchResult.Any(q => q.TextReport.ToLower().Contains(string.Format("Total winner: {0}", Constants.ProgrammingLanguage.Java).ToLower()));
 
             //Assert
             Assert.IsTrue(isJavaTotalWinner, string.Format("Total Winner must be {0}", Constants.ProgrammingLanguage.Java));
@@ -78,13 +78,13 @@ namespace Tests
         public void CriteriaElementsNumberAreEqualsToDetailElementsNumbe()
         {
             //Arrange
-            var programmingLanguageEngineList = GetData();
+            var data = GetData();
 
             //Act
-            var searchProgrammingLanguaResult = SearchCriteria(programmingLanguageEngineList);
+            var searchResult = SearchResult(data);
 
-            var criteriaItems = programmingLanguageEngineList.Select(q=> q.ProgrammingLanguage.Id).Distinct().Count();
-            var detailItems = searchProgrammingLanguaResult.Count(q => q.SectionReportId == (int)SectionReport_Enum.Detail);
+            var criteriaItems = data.Select(q=> q.SearchText.Id).Distinct().Count();
+            var detailItems = searchResult.Count(q => q.SectionResultId == (int)SectionReport_Enum.Detail);
 
             var sameNumberOfElements = criteriaItems == detailItems;
 
@@ -93,53 +93,53 @@ namespace Tests
 
         }
 
-        private List<ReportResult> SearchCriteria(List<ProgrammingLanguageEngine> programmingLanguageEngineList)
+        private List<SearchResult> SearchResult(List<SearchEngine> searchEngineList)
         {
-            var service = _applicationProvider.GetService<IProgrammingLanguageEngineApplication>();
-            var request = new SearchProgrammingLanguageRequest();
-            foreach (var programmingLanguage in programmingLanguageEngineList.Select(q => q.ProgrammingLanguage.Name).Distinct())
+            var service = _applicationProvider.GetService<ISearchEngineApplication>();
+            var request = new SearchRequest();
+            foreach (var text in searchEngineList.Select(q => q.SearchText.Name).Distinct())
             {
-                request.Criteria.Add(programmingLanguage);
+                request.Criteria.Add(text);
             }
 
             //Act
-            return service.SearchProgrammingLanguage(request, programmingLanguageEngineList);
+            return service.SearchTerm(request, searchEngineList);
         }
 
-        private List<ProgrammingLanguageEngine> GetData()
+        private List<SearchEngine> GetData()
         {
-            var programmingLanguageEngineList = new List<ProgrammingLanguageEngine>()
+            var searchEngineList = new List<SearchEngine>()
             {
-                new ProgrammingLanguageEngine(){
+                new SearchEngine(){
                     Engine = Constants.EngineName.Yahoo,
-                    ProgrammingLanguage= new ProgrammingLanguage(1, Constants.ProgrammingLanguage.Java),
+                    SearchText= new SearchText(1, Constants.ProgrammingLanguage.Java),
                     ResultCount = 100
                 },
-                new ProgrammingLanguageEngine(){
+                new SearchEngine(){
                     Engine = Constants.EngineName.Yahoo,
-                    ProgrammingLanguage= new ProgrammingLanguage(2, Constants.ProgrammingLanguage.Net),
+                    SearchText= new SearchText(2, Constants.ProgrammingLanguage.Net),
                     ResultCount = 100
                 },
-                new ProgrammingLanguageEngine(){
+                new SearchEngine(){
                     Engine = Constants.EngineName.Google,
-                    ProgrammingLanguage= new ProgrammingLanguage(1, Constants.ProgrammingLanguage.Net),
+                    SearchText= new SearchText(1, Constants.ProgrammingLanguage.Net),
                     ResultCount = 10
                 },
-                new ProgrammingLanguageEngine(){
+                new SearchEngine(){
                     Engine = Constants.EngineName.Google,
-                    ProgrammingLanguage= new ProgrammingLanguage(1, Constants.ProgrammingLanguage.Java),
+                    SearchText= new SearchText(1, Constants.ProgrammingLanguage.Java),
                     ResultCount = 20
                 }
             };
 
-            return programmingLanguageEngineList;
+            return searchEngineList;
         }
 
         public static void RegisterServices()
         {
             var collection = new ServiceCollection();
-            collection.AddScoped<IProgrammingLanguageEngineApplication, ProgrammingLanguageEngineApplication>();
-            collection.AddScoped<IProgrammingLanguageEngineRepository, ProgrammingLanguageEngineRepository>();
+            collection.AddScoped<ISearchEngineApplication, SearchEngineApplication>();
+            collection.AddScoped<ISearchEngineRepository, SearchEngineRepository>();
             collection.AddScoped<IEngineApplication, EngineApplication>();
             collection.AddScoped<IEngineRepository, EngineRepository>();
             _applicationProvider = collection.BuildServiceProvider();

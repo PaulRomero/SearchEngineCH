@@ -4,9 +4,9 @@ using System.Text;
 
 namespace SearchFlight.Application.DTOs.Response
 {
-    public class ReportResult
+    public class SearchResult
     {
-        public int SectionReportId { get; set; }
+        public int SectionResultId { get; set; }
         public string TextReport { get; set; }
 
     }

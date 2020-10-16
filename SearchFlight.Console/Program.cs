@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SearchFlight.Application;
-using SearchFlight.Application.DTOs.Request.ProgrammingLanguageEngine;
+using SearchFlight.Application.DTOs.Request;
 using SearchFlight.Application.Interfaces;
 using SearchFlight.Application.Services;
 using SearchFlight.Application.Services.Interfaces;
@@ -24,6 +24,7 @@ namespace SearchFlight.Console
             {
                 RegisterServices();
                 SearchWords(args);
+                ContinueSearching(args);
             }
             catch (SearchFlightException ex)
             {
@@ -42,13 +43,28 @@ namespace SearchFlight.Console
             System.Console.ReadLine();
         }
 
+        private static void ContinueSearching(string[] args)
+        {
+            System.Console.WriteLine("Do you want continue searching? (press (Y)es or any key to exist): ");
+            var read = System.Console.ReadLine();
+            if (read.ToLower() == "y")
+            {
+                Main(args);
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
+        }
+
         private static void SearchWords(string[] args)
         {
-            System.Console.WriteLine("=============");
-            System.Console.WriteLine("Search Flight ");
-            System.Console.WriteLine("=============");
+            System.Console.WriteLine("=================================================");
+            System.Console.WriteLine("==========        SEARCH FIGHT        ==========");
+            System.Console.WriteLine("=================================================");
             System.Console.WriteLine("Enter search criteria separated by empty space : ");
             var read = System.Console.ReadLine();
+            System.Console.WriteLine("");
 
             if (string.IsNullOrEmpty(read))
             {
@@ -62,17 +78,18 @@ namespace SearchFlight.Console
             SearchCriteria(request);
         }
 
-        private static void SearchCriteria(SearchProgrammingLanguageRequest request)
+        private static void SearchCriteria(SearchRequest request)
         {
-            var service = _applicationProvider.GetService<IProgrammingLanguageEngineApplication>();
-            var searchProgrammingLanguaResult = service.SearchProgrammingLanguage(request);
+            var service = _applicationProvider.GetService<ISearchEngineApplication>();
+            var searchTermResult = service.SearchTerm(request);
 
-            if (searchProgrammingLanguaResult.Any())
+            if (searchTermResult.Any())
             {
-                searchProgrammingLanguaResult.ForEach(q =>
+                searchTermResult.ForEach(q =>
                 {
-                    System.Console.WriteLine(string.Format("{0}", q.TextReport));
+                    System.Console.WriteLine(string.Format("{0}{1}", q.TextReport, Environment.NewLine));
                 });
+
             }
             else
             {
@@ -80,12 +97,12 @@ namespace SearchFlight.Console
             }
         }
 
-        private static SearchProgrammingLanguageRequest CreateRequest(string read)
+        private static SearchRequest CreateRequest(string read)
         {
             var changeRead = read.Replace('"', '|');
             var split = changeRead.Split(' ');
             var criteriaList = CreateCriteriaList(split);
-            var request = new SearchProgrammingLanguageRequest()
+            var request = new SearchRequest()
             {
                 Criteria = criteriaList
             };
@@ -137,8 +154,8 @@ namespace SearchFlight.Console
         public static void RegisterServices()
         {
             var collection = new ServiceCollection();
-            collection.AddScoped<IProgrammingLanguageEngineApplication, ProgrammingLanguageEngineApplication>();
-            collection.AddScoped<IProgrammingLanguageEngineRepository, ProgrammingLanguageEngineRepository>();
+            collection.AddScoped<ISearchEngineApplication, SearchEngineApplication>();
+            collection.AddScoped<ISearchEngineRepository, SearchEngineRepository>();
             collection.AddScoped<IEngineApplication, EngineApplication>();
             collection.AddScoped<IEngineRepository, EngineRepository>();
             _applicationProvider = collection.BuildServiceProvider();

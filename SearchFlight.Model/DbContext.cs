@@ -1,4 +1,4 @@
-﻿using SearchFlight.Application.DTOs.Request.ProgrammingLanguageEngine;
+﻿using SearchFlight.Application.DTOs.Request;
 using SearchFlight.CrossCutting;
 using System;
 using System.Collections.Generic;
@@ -9,21 +9,21 @@ namespace SearchFlight.Model
     {
         //This class emulate the entity framework Context
 
-        public static List<ProgrammingLanguageEngine> GetDummyData(SearchProgrammingLanguageRequest request)
+        public static List<SearchEngine> GetEngineDummyResult(SearchRequest request)
         {
             var id = 1;
-            var ProgrammingLanguageList = new List<ProgrammingLanguageEngine>();
+            var searchEngineList = new List<SearchEngine>();
 
-            request.Criteria.ForEach(language => {
-                var languageProgramming = new ProgrammingLanguage(id++, language);
+            request.Criteria.ForEach(text => {
+                var searchText = new SearchText(id++, text);
                 foreach (var engine in GetEngineList())
                 {
-                    var progLangEngine = new ProgrammingLanguageEngine() { Engine = engine.Name, ProgrammingLanguage = languageProgramming, ResultCount = new Random().Next(1000, 50000) };
-                    ProgrammingLanguageList.Add(progLangEngine);
+                    var progLangEngine = new SearchEngine() { Engine = engine.Name, SearchText = searchText, ResultCount = new Random().Next(1000, 50000) };
+                    searchEngineList.Add(progLangEngine);
                 }
             });
 
-            return ProgrammingLanguageList;
+            return searchEngineList;
 
         }
 

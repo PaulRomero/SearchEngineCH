@@ -4,10 +4,10 @@ using System.Text;
 
 namespace SearchFlight.Model
 {
-    public class ProgrammingLanguageEngine
+    public class SearchEngine
     {
         public string Engine { get; set; }
         public int ResultCount { get; set; }
-        public ProgrammingLanguage ProgrammingLanguage { get; set; }
+        public SearchText SearchText { get; set; }
     }
 }

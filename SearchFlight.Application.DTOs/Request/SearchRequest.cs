@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SearchFlight.Application.DTOs.Request.ProgrammingLanguageEngine
+namespace SearchFlight.Application.DTOs.Request
 {
-    public class SearchProgrammingLanguageRequest
+    public class SearchRequest
     {
-        public SearchProgrammingLanguageRequest()
+        public SearchRequest()
         {
             Criteria = new List<string>();
         }
