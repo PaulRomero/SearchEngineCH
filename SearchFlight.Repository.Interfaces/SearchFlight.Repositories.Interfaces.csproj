@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SearchFlight.Application.DTOs\SearchFlight.Application.DTOs.csproj" />
+    <ProjectReference Include="..\SearchFlight.Model\SearchFlight.Model.csproj" />
+  </ItemGroup>
+
+</Project>
