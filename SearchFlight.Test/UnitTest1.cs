@@ -75,7 +75,7 @@ namespace Tests
         }
 
         [Test]
-        public void CriteriaElementsIsEqualsDetailElements()
+        public void CriteriaElementsNumberAreEqualsToDetailElementsNumbe()
         {
             //Arrange
             var programmingLanguageEngineList = GetData();
@@ -89,7 +89,7 @@ namespace Tests
             var sameNumberOfElements = criteriaItems == detailItems;
 
             //Assert
-            Assert.IsTrue(sameNumberOfElements, "Criteria elements does not match with details Report elements");
+            Assert.IsTrue(sameNumberOfElements, "Criteria elements number does not match with details report elements number");
 
         }
 
