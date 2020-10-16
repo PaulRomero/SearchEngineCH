@@ -89,7 +89,7 @@ namespace Tests
             var sameNumberOfElements = criteriaItems == detailItems;
 
             //Assert
-            Assert.sTrue(sameNumberOfElements, "Criteria elements does not match with details Report elements");
+            Assert.IsTrue(sameNumberOfElements, "Criteria elements does not match with details Report elements");
 
         }
 
